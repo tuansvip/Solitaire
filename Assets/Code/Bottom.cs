@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Bottom : MonoBehaviour
 {
@@ -18,7 +19,13 @@ public class Bottom : MonoBehaviour
     {
         boxCollider2D = GetComponent<BoxCollider2D>();
     }
-
+    private void Update()
+    {
+        if (cards.Count == 0)
+        {
+            value = 14;
+        }
+    }
     private void FixedUpdate()
     {
         if (GameManager.instance.draggingCard != null)

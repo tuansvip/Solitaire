@@ -32,6 +32,7 @@ public class Card : MonoBehaviour
     public bool isDragging = false;
     public bool fromBot = false;
     public bool fromTop = false;
+    public bool isAuto = true;
 
     private void Start()
     {

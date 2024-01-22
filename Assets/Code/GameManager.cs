@@ -15,8 +15,12 @@ public class GameManager : MonoBehaviour
     public GameObject cardPrefabs;
     public DrawZone drawZone;
     public List<Bottom> bottom;
+    public List<Top> tops;
     public GameObject draggingCard;
     public List<GameObject> listDraggingBot;
+    public GameObject winPanel;
+
+    public bool isStarted = false;
 
     private void Awake()
     {
@@ -26,8 +30,104 @@ public class GameManager : MonoBehaviour
         SuffleDeck();
         deck.GetComponent<Deck>().setOffset();
         FirstDeal();
+        isStarted = true;
+    }
+    private void FixedUpdate()
+    {
+        if (CheckWin())
+        {
+            Win();
+        }
     }
 
+    private void Win()
+    {
+        winPanel.SetActive(true);
+    }
+
+    private void Update()
+    {
+        if (isStarted)
+        {
+            foreach (Bottom bot in bottom)
+            {
+                if (bot.cards.Count > 0)
+                {
+                    Card lastCard = bot.cards[bot.cards.Count - 1].GetComponent<Card>();
+                    if (!lastCard.isAuto) continue;
+                    foreach (Top top in tops)
+                    {
+                        if (lastCard.cardValue == 1 && top.value == 0)
+                        {
+                            lastCard.targetPos = top.transform.position;
+                            top.cards.Add(lastCard.gameObject);
+                            lastCard.isOnTop = true;
+                            lastCard.isOnBottom = false;
+                            lastCard.isFaceUp = true;
+                            lastCard.isAuto = false;
+                            lastCard.transform.SetParent(top.transform);
+                            bot.cards.Remove(lastCard.gameObject);
+                            top.value = lastCard.cardValue;
+                            top.suit = lastCard.suit;
+                            break;
+                        }
+                        else if (lastCard.cardValue == top.value + 1 && lastCard.suit == top.suit)
+                        {
+                            lastCard.targetPos = top.transform.position;
+                            top.cards.Add(lastCard.gameObject);
+                            lastCard.isOnTop = true;
+                            lastCard.isOnBottom = false;
+                            lastCard.isAuto = false;
+                            lastCard.transform.SetParent(top.transform);
+                            bot.cards.Remove(lastCard.gameObject);
+                            lastCard.isFaceUp = true;
+
+                            top.value = lastCard.cardValue;
+                            top.suit = lastCard.suit;
+                            break;
+                        }
+                    }
+                }
+                if (drawZone.cards.Count > 0)
+                {
+                    Card lastCard = drawZone.cards[drawZone.cards.Count - 1].GetComponent<Card>();
+                    foreach (Top top in tops)
+                    {
+                        if (lastCard.cardValue == 1 && top.value == 0)
+                        {
+                            lastCard.targetPos = top.transform.position;
+                            top.cards.Add(lastCard.gameObject);
+                            lastCard.isOnTop = true;
+                            lastCard.isOnBottom = false;
+                            lastCard.isAuto = false;
+                            lastCard.transform.SetParent(top.transform);
+                            lastCard.isFaceUp = true;
+                            drawZone.cards.Remove(lastCard.gameObject);
+                            top.value = lastCard.cardValue;
+                            top.suit = lastCard.suit;
+                            break;
+                        }
+                        else if (lastCard.cardValue == top.value + 1 && lastCard.suit == top.suit)
+                        {
+                            lastCard.targetPos = top.transform.position;
+                            top.cards.Add(lastCard.gameObject);
+                            lastCard.isOnTop = true;
+                            lastCard.isOnBottom = false;
+                            lastCard.isAuto = false;    
+                            lastCard.transform.SetParent(top.transform);
+                            lastCard.isFaceUp = true;
+                            drawZone.cards.Remove(lastCard.gameObject);
+                            top.value = lastCard.cardValue;
+                            top.suit = lastCard.suit;
+                            break;
+                        }
+                    }
+                }
+                else continue;
+
+            }
+        }
+    }
     private void GenerateCards()
     {
         for(int i = 1; i <= 13; i++)
@@ -98,5 +198,14 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public bool CheckWin()
+    {
+        foreach(Top top in tops)
+        {
+            if (top.value != 13) return false;
+        }
+        return true;
     }
 }
