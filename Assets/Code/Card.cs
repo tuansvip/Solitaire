@@ -267,7 +267,7 @@ public class Card : MonoBehaviour
     {
         if (!isDragging)
         {
-            transform.position = Vector3.Lerp(transform.position, targetPos, 0.3f);
+            transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
         }
     }
 }
